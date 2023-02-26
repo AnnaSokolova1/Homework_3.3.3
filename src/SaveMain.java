@@ -20,6 +20,10 @@ public class SaveMain {
         saveGame(arrayList.get(2), gameProgress3);
 
         zipFiles("C:/Games/savegames/zip.zip", arrayList);
+        for (String path : arrayList) {
+            File file = new File(path);
+            file.delete();
+        }
     }
 
     public static void saveGame(String path, GameProgress game) {
@@ -31,20 +35,22 @@ public class SaveMain {
         }
     }
 
-    public static void zipFiles(String path, List<String> arrayList) {
+    public static void zipFiles(String path, List<String> list) {
         try (ZipOutputStream zout = new ZipOutputStream(new FileOutputStream(path))) {
-            for (String a : arrayList) {
-                zout.putNextEntry(new ZipEntry(new File(a).getName()));
-                try (FileInputStream fis = new FileInputStream(a)) {
+            for (int i = 0; i < list.size(); i++) {
+                try (FileInputStream fis = new FileInputStream(list.get(i))) {
+                    ZipEntry entry = new ZipEntry("save" + i + ".dat");
+                    zout.putNextEntry(entry);
                     byte[] buffer = new byte[fis.available()];
                     fis.read(buffer);
                     zout.write(buffer);
                     zout.closeEntry();
+                } catch (Exception ex) {
+                    System.out.println(ex.getMessage());
                 }
-                new File(a).delete();
             }
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 }
